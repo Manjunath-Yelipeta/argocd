@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: aws-load-balancer-controller
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://aws.github.io/eks-charts
+    chart: aws-load-balancer-controller
+    targetRevision: 3.5.0  # Replace with your desired chart version
+    helm:
+      values: |
+        clusterName: roboshop-dev
+        region: us-east-1
+        serviceAccount:
+          create: false
+          name: aws-load-balancer-controller
+
+  destination:
+    server: 'https://default.svc'
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
