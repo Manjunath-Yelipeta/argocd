@@ -1,28 +1,33 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: aws-load-balancer-controller
+  name: aws-lbc
   namespace: argocd
+  # The finalizer enables cascading deletes (deleting this app deletes its resources)
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
+  # The Argo CD project this application belongs to
   project: default
+
   source:
-    repoURL: https://aws.github.io/eks-charts
     chart: aws-load-balancer-controller
-    targetRevision: 3.5.0  # Replace with your desired chart version
+    repoURL: https://aws.github.io/eks-charts
+    targetRevision: 3.5.0 # chart-version
     helm:
+      # --set
       values: |
-        clusterName: roboshop-dev
+        clusterName: roboshop
         region: us-east-1
         serviceAccount:
           create: false
           name: aws-load-balancer-controller
 
+  # Destination configuration pointing to the target cluster and namespace
   destination:
-    server: 'https://default.svc'
+    server: https://kubernetes.default.svc
     namespace: kube-system
   syncPolicy:
     automated:
-      prune: true
+      prune: true       # Automatically deletes resources no longer in Git
       selfHeal: true
