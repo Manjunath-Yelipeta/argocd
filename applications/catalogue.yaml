@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: catalogue
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Manjunath-Yelipeta/roboshop-helm.git
+    targetRevision: main
+    path: catalogue
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: roboshop
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  
